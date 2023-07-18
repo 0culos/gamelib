@@ -1,15 +1,5 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Gamelib</title>
-</head>
-<body>
-    <div class="container">
-      <div class="page-header">
-          <h1>{{ title }}</h1>
-      </div>
+{% extends "base.html" %}
+{% block content %}
       <form action="/create" method="post">
         <fieldset>
           <div class="form-group">
@@ -27,6 +17,4 @@
           <button type="submit" class="btn btn-primary btn-save">Save</button>
         </fieldset>
       </form>
-    </div>
-</body>
-</html>
+{% endblock %}
