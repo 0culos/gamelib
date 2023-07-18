@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 
 
 class Game:
@@ -43,6 +43,19 @@ def create():
         return redirect(url_for('index'))
 
     return render_template('list.html', title='Games', games=game_list)
+
+
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+
+@app.route('/authenticate', methods=('GET', 'POST'))
+def authenticate():
+    if 'alohomora' == request.form['password']:
+        return redirect('/')
+    else:
+        return redirect('/login')
 
 
 app.run()
