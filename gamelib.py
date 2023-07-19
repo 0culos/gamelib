@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 
 
 class Game:
@@ -17,11 +17,11 @@ game3 = Game('Crash', 'Adventure', 'PS1')
 game_list = [game1, game2, game3]
 
 app = Flask(__name__)
+app.secret_key = 'dev'
 
 
 @app.route('/')
 def index():
-
     return render_template('list.html', title='Games', games=game_list)
 
 
@@ -53,8 +53,11 @@ def login():
 @app.route('/authenticate', methods=('GET', 'POST'))
 def authenticate():
     if 'alohomora' == request.form['password']:
+        session['logged_in'] = request.form['user']
+        flash(session['logged_in'] + ' logged in successfully.')
         return redirect('/')
     else:
+        flash('Login failed.')
         return redirect('/login')
 
 
