@@ -61,4 +61,11 @@ def authenticate():
         return redirect('/login')
 
 
+@app.route('/logout')
+def logout():
+    session['logged_in'] = None
+    flash('User logged out successfully')
+    return redirect('/')
+
+
 app.run()
