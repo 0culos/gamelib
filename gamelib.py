@@ -16,6 +16,23 @@ game2 = Game('God of War', 'Rack and Slash', 'PS2')
 game3 = Game('Crash', 'Adventure', 'PS1')
 game_list = [game1, game2, game3]
 
+
+class User:
+    def __init__(self, name, nickname, password):
+        self.name = name
+        self.nikname = nickname
+        self.password = password
+
+
+user1 = User('Danilo Pereira', 'Zóio', 'alohomora')
+user2 = User('Camila Ferreira', 'Mila', 'paozinho')
+user3 = User('Guilherme Louro', 'Cake', 'python_eh_vida')
+
+users = {user1.nikname: user1,
+         user2.nikname: user2,
+         user3.nikname: user3
+         }
+
 app = Flask(__name__)
 app.secret_key = 'dev'
 
@@ -55,11 +72,13 @@ def login():
 
 @app.route('/authenticate', methods=('GET', 'POST'))
 def authenticate():
-    if 'alohomora' == request.form['password']:
-        session['logged_in'] = request.form['user']
-        flash(session['logged_in'] + ' logged in successfully.')
-        next_page = request.form['next_page']
-        return redirect(next_page)
+    if request.form['user'] in users:
+        user = users[request.form['user']]
+        if request.form['password'] == user.password:
+            session['logged_in'] = user.nikname
+            flash(user.nikname + ' logged in successfully.')
+            next_page = request.form['next_page']
+            return redirect(next_page)
     else:
         flash('Login failed.')
         return redirect(url_for('login'))
