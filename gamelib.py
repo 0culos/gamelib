@@ -27,6 +27,8 @@ def index():
 
 @app.route('/new_game')
 def new_game():
+    if 'logged_in' not in session or session['logged_in'] is None:
+        return redirect(url_for('login', next_page=url_for('new_game')))
     return render_template('new_game.html', title='New Game')
 
 
@@ -47,7 +49,8 @@ def create():
 
 @app.route('/login')
 def login():
-    return render_template('login.html')
+    next_page = request.args.get('next_page')
+    return render_template('login.html', next_page=next_page)
 
 
 @app.route('/authenticate', methods=('GET', 'POST'))
@@ -55,17 +58,18 @@ def authenticate():
     if 'alohomora' == request.form['password']:
         session['logged_in'] = request.form['user']
         flash(session['logged_in'] + ' logged in successfully.')
-        return redirect('/')
+        next_page = request.form['next_page']
+        return redirect(next_page)
     else:
         flash('Login failed.')
-        return redirect('/login')
+        return redirect(url_for('login'))
 
 
 @app.route('/logout')
 def logout():
     session['logged_in'] = None
     flash('User logged out successfully')
-    return redirect('/')
+    return redirect(url_for('index'))
 
 
 app.run()
