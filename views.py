@@ -37,16 +37,27 @@ def create():
         return redirect(url_for('index'))
 
 
-@app.route('/edit')
-def edit():
+@app.route('/edit/<int:id>')
+def edit(id):
     if 'logged_in' not in session or session['logged_in'] is None:
         return redirect(url_for('login', next_page=url_for('edit')))
-    return render_template('edit.html', title='Editing Game')
+
+    game = Games.query.filter_by(id=id).first()
+    return render_template('edit.html', title='Editing Game', game=game)
 
 
 @app.route('/update', methods=('GET', 'POST'))
 def update():
-    pass
+    game = Games.query.filter_by(id=request.form['id']).first()
+
+    game.name = request.form['name']
+    game.category = request.form['category']
+    game.console = request.form['console']
+
+    db.session.add(game)
+    db.session.commit()
+
+    return redirect(url_for('index'))
 
 
 @app.route('/login')
