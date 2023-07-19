@@ -34,6 +34,8 @@ def create():
         db.session.add(new)
         db.session.commit()
 
+        flash("Successfully game added")
+
         return redirect(url_for('index'))
 
 
@@ -56,6 +58,19 @@ def update():
 
     db.session.add(game)
     db.session.commit()
+
+    return redirect(url_for('index'))
+
+
+@app.route('/delete/<int:id>')
+def delete(id):
+    if 'logged_in' not in session or session['logged_in'] is None:
+        return redirect(url_for('login'))
+
+    Games.query.filter_by(id=id).delete()
+    db.session.commit()
+
+    flash("Successfully deleted game")
 
     return redirect(url_for('index'))
 
