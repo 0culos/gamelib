@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash, session
+from flask import render_template, request, redirect, url_for, flash, session, send_from_directory
 
 from gamelib import app, db
 from models import Games, Users
@@ -35,8 +35,9 @@ def create():
         db.session.commit()
 
         file = request.files['file']
+        upload_path = app.config['UPLOAD_PATH']
 
-        file.save(f'uploads/{file.filename}')
+        file.save(f'{upload_path}/cover{new.id}.jpg')
 
         flash("Successfully game added")
 
@@ -104,3 +105,8 @@ def logout():
     session['logged_in'] = None
     flash('User logged out successfully')
     return redirect(url_for('index'))
+
+
+@app.route('/uploads/<file_name>')
+def image(file_name):
+    return send_from_directory('uploads', file_name)
