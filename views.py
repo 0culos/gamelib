@@ -1,8 +1,10 @@
+import time
+
 from flask import render_template, request, redirect, url_for, flash, session, send_from_directory
 
 from gamelib import app, db
 from models import Games, Users
-from helpers import return_image
+from helpers import return_image, delete_image
 
 
 @app.route('/')
@@ -37,8 +39,8 @@ def create():
 
         file = request.files['file']
         upload_path = app.config['UPLOAD_PATH']
-
-        file.save(f'{upload_path}/cover{new.id}.jpg')
+        timestamp = time.time()
+        file.save(f'{upload_path}/cover{new.id}-{timestamp}.jpg')
 
         flash("Successfully game added")
 
@@ -68,8 +70,11 @@ def update():
 
     file = request.files['file']
     upload_path = app.config['UPLOAD_PATH']
+    timestamp = time.time()
+    delete_image(game.id)
+    file.save(f'{upload_path}/cover{game.id}-{timestamp}.jpg')
 
-    file.save(f'{upload_path}/cover{game.id}.jpg')
+    flash("Game updated successfully")
 
     return redirect(url_for('index'))
 
