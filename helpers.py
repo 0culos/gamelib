@@ -1,5 +1,14 @@
 import os
 from gamelib import app
+from flask_wtf import FlaskForm
+from wtforms import StringField, validators, SubmitField
+
+
+class GameForm(FlaskForm):
+    name = StringField('Game Title', [validators.DataRequired(), validators.Length(min=1, max=50)])
+    category = StringField('Category', [validators.DataRequired(), validators.Length(min=1, max=40)])
+    console = StringField('Console', [validators.DataRequired(), validators.Length(min=1, max=20)])
+    save = SubmitField('Save')
 
 
 def return_image(id):

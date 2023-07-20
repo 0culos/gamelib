@@ -92,7 +92,7 @@ def delete(id):
     return redirect(url_for('index'))
 
 
-@app.route('/login')
+@app.route('/login', methods=('GET', 'POST'))
 def login():
     next_page = request.args.get('next_page')
     return render_template('login.html', next_page=next_page)

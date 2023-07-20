@@ -25,6 +25,7 @@
             <input type="text" id="console" name="console" class="form-control" value="{{ game.console }}">
           </div>
           <button type="submit" class="btn btn-primary btn-save">Save</button>
+          <a class="btn btn-danger" href="{{ url_for('index') }}">Go Back</a>
         </fieldset>
       </form>
 {% endblock %}
