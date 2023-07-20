@@ -4,7 +4,7 @@ from flask import render_template, request, redirect, url_for, flash, session, s
 
 from gamelib import app, db
 from models import Games, Users
-from helpers import return_image, delete_image
+from helpers import return_image, delete_image, GameForm
 
 
 @app.route('/')
@@ -17,34 +17,39 @@ def index():
 def new_game():
     if 'logged_in' not in session or session['logged_in'] is None:
         return redirect(url_for('login', next_page=url_for('new_game')))
-    return render_template('new_game.html', title='New Game')
+    form = GameForm()
+    return render_template('new_game.html', title='New Game', form=form)
 
 
 @app.route('/create', methods=('GET', 'POST'))
 def create():
-    if request.method == 'POST':
-        name = request.form['name']
-        category = request.form['category']
-        console = request.form['console']
-        game = Games.query.filter_by(name=name).first()
+    form = GameForm(request.form)
 
-        if game:
-            flash('Game already exists.')
-            return redirect(url_for('index'))
+    if not form.validate_on_submit():
+        return redirect(url_for('new_game'))
 
-        new = Games(name=name, category=category, console=console)
+    name = form.name.data
+    category = form.category.data
+    console = form.console.data
+    game = Games.query.filter_by(name=name).first()
 
-        db.session.add(new)
-        db.session.commit()
-
-        file = request.files['file']
-        upload_path = app.config['UPLOAD_PATH']
-        timestamp = time.time()
-        file.save(f'{upload_path}/cover{new.id}-{timestamp}.jpg')
-
-        flash("Successfully game added")
-
+    if game:
+        flash('Game already exists.')
         return redirect(url_for('index'))
+
+    new = Games(name=name, category=category, console=console)
+
+    db.session.add(new)
+    db.session.commit()
+
+    file = request.files['file']
+    upload_path = app.config['UPLOAD_PATH']
+    timestamp = time.time()
+    file.save(f'{upload_path}/cover{new.id}-{timestamp}.jpg')
+
+    flash("Successfully game added")
+
+    return redirect(url_for('index'))
 
 
 @app.route('/edit/<int:id>')
@@ -53,28 +58,35 @@ def edit(id):
         return redirect(url_for('login', next_page=url_for('edit', id=id)))
 
     game = Games.query.filter_by(id=id).first()
+    form = GameForm()
+    form.name.data = game.name
+    form.category.data = game.category
+    form.console.data = game.console
     game_cover = return_image(id)
-    return render_template('edit.html', title='Editing Game', game=game, game_cover=game_cover)
+    return render_template('edit.html', title='Editing Game', id=id, game_cover=game_cover, form=form)
 
 
 @app.route('/update', methods=('GET', 'POST'))
 def update():
-    game = Games.query.filter_by(id=request.form['id']).first()
+    form = GameForm(request.form)
 
-    game.name = request.form['name']
-    game.category = request.form['category']
-    game.console = request.form['console']
+    if form.validate_on_submit():
+        game = Games.query.filter_by(id=request.form['id']).first()
 
-    db.session.add(game)
-    db.session.commit()
+        game.name = form.name.data
+        game.category = form.category.data
+        game.console = form.console.data
 
-    file = request.files['file']
-    upload_path = app.config['UPLOAD_PATH']
-    timestamp = time.time()
-    delete_image(game.id)
-    file.save(f'{upload_path}/cover{game.id}-{timestamp}.jpg')
+        db.session.add(game)
+        db.session.commit()
 
-    flash("Game updated successfully")
+        file = request.files['file']
+        upload_path = app.config['UPLOAD_PATH']
+        timestamp = time.time()
+        delete_image(game.id)
+        file.save(f'{upload_path}/cover{game.id}-{timestamp}.jpg')
+
+        flash("Game updated successfully")
 
     return redirect(url_for('index'))
 
@@ -122,4 +134,3 @@ def logout():
 @app.route('/uploads/<file_name>')
 def image(file_name):
     return send_from_directory('uploads', file_name)
-
