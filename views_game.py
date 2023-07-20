@@ -3,7 +3,7 @@ import time
 from flask import render_template, request, redirect, url_for, flash, session, send_from_directory
 
 from gamelib import app, db
-from models import Games, Users
+from models import Games
 from helpers import return_image, delete_image, GameForm
 
 
@@ -101,33 +101,6 @@ def delete(id):
 
     flash("Successfully deleted game")
 
-    return redirect(url_for('index'))
-
-
-@app.route('/login', methods=('GET', 'POST'))
-def login():
-    next_page = request.args.get('next_page')
-    return render_template('login.html', next_page=next_page)
-
-
-@app.route('/authenticate', methods=('GET', 'POST'))
-def authenticate():
-    user = Users.query.filter_by(nickname=request.form['user']).first()
-    if user:
-        if request.form['password'] == user.password:
-            session['logged_in'] = user.nickname
-            flash(user.nickname + ' logged in successfully.')
-            next_page = request.form['next_page']
-            return redirect(next_page)
-    else:
-        flash('Login failed.')
-        return redirect(url_for('login'))
-
-
-@app.route('/logout')
-def logout():
-    session['logged_in'] = None
-    flash('User logged out successfully')
     return redirect(url_for('index'))
 
 

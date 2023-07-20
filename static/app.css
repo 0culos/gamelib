@@ -45,11 +45,11 @@ td {
     text-align: center;
 }
 
-.formularioJogo {
+.gameForm {
     display: flex;
 }
 
-.formularioImagem {
+.imageForm {
     margin-right: 16px
 }
 
@@ -61,7 +61,7 @@ td {
     width: 700px;
 }
 
-.inputsJogo {
+.inputsGame {
     width: 100%;
     margin-left: 1em;
     margin-bottom: 1em;
