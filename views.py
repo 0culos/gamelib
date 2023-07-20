@@ -2,6 +2,7 @@ from flask import render_template, request, redirect, url_for, flash, session, s
 
 from gamelib import app, db
 from models import Games, Users
+from helpers import return_image
 
 
 @app.route('/')
@@ -47,10 +48,11 @@ def create():
 @app.route('/edit/<int:id>')
 def edit(id):
     if 'logged_in' not in session or session['logged_in'] is None:
-        return redirect(url_for('login', next_page=url_for('edit')))
+        return redirect(url_for('login', next_page=url_for('edit', id=id)))
 
     game = Games.query.filter_by(id=id).first()
-    return render_template('edit.html', title='Editing Game', game=game)
+    game_cover = return_image(id)
+    return render_template('edit.html', title='Editing Game', game=game, game_cover=game_cover)
 
 
 @app.route('/update', methods=('GET', 'POST'))
@@ -63,6 +65,11 @@ def update():
 
     db.session.add(game)
     db.session.commit()
+
+    file = request.files['file']
+    upload_path = app.config['UPLOAD_PATH']
+
+    file.save(f'{upload_path}/cover{game.id}.jpg')
 
     return redirect(url_for('index'))
 
@@ -110,3 +117,4 @@ def logout():
 @app.route('/uploads/<file_name>')
 def image(file_name):
     return send_from_directory('uploads', file_name)
+
